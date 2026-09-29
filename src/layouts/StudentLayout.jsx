@@ -13,6 +13,7 @@ import {
   History,
   Bell,
   Settings,
+  Menu,
 } from "lucide-react";
 
 import { useAuth } from "../context/AuthContext";
@@ -67,6 +68,7 @@ function StudentLayout() {
 
   const [unreadCount, setUnreadCount] = useState(0);
   const [profile, setProfile] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // Active sidebar animation
   const navRef = useRef(null);
@@ -112,11 +114,14 @@ function StudentLayout() {
     const navRect = navElement.getBoundingClientRect();
     const itemRect = activeElement.getBoundingClientRect();
 
-    setIndicator({
-      top: itemRect.top - navRect.top,
-      height: itemRect.height,
-    });
-  }, [location.pathname]);
+      setIndicator({
+        top: itemRect.top - navRect.top,
+        height: itemRect.height,
+      });
+    },
+    // menuOpen matters: the rects are only measurable once the drawer is shown
+    [location.pathname, menuOpen]
+  );
 
   const pictureUrl = profile?.profilePictureUrl
     ? `${API_ORIGIN}${profile.profilePictureUrl}`
@@ -125,8 +130,21 @@ function StudentLayout() {
   return (
     <div className="flex min-h-screen bg-app-bg">
 
-      {/* Sidebar */}
-      <aside className="hidden w-64 flex-col border-r border-border bg-surface px-4 py-6 md:fixed md:inset-y-0 md:flex">
+      {/* Mobile scrim */}
+      {menuOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm md:hidden"
+          onClick={() => setMenuOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Sidebar — becomes a drawer on mobile */}
+      <aside
+        className={`${
+          menuOpen ? "flex animate-drawer-in-left" : "hidden"
+        } fixed inset-y-0 left-0 z-50 w-64 flex-col overflow-y-auto border-r border-border bg-surface px-4 py-6 md:z-auto md:flex`}
+      >
 
         {/* Logo */}
         <div className="mb-8 px-2">
@@ -155,6 +173,7 @@ function StudentLayout() {
               <NavLink
                 key={item.to}
                 to={item.to}
+                onClick={() => setMenuOpen(false)}
                 ref={(element) => {
                   itemRefs.current[item.to] = element;
                 }}
@@ -222,7 +241,18 @@ function StudentLayout() {
 
         <header className="flex items-center justify-between border-b border-border bg-surface px-6 py-4 md:hidden">
 
-          <Logo variant="arc" className="text-lg text-primary" />
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setMenuOpen(true)}
+              aria-label="Open navigation"
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-text-secondary transition hover:bg-app-bg hover:text-primary"
+            >
+              <Menu size={20} />
+            </button>
+
+            <Logo variant="arc" className="text-lg text-primary" />
+          </div>
 
           <button
             onClick={() => navigate("/student/profile")}

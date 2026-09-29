@@ -149,17 +149,13 @@ function AnswerReview() {
                           {letter}. {option.optionText}
                         </span>
 
-                        {(isSelected || isCorrectOption) && (
+                        {isSelected !== isCorrectOption && (
                           <span
                             className={`shrink-0 text-[11px] font-semibold ${
                               isCorrectOption ? "text-success" : "text-error"
                             }`}
                           >
-                            {isCorrectOption && !isSelected
-                              ? "Correct answer"
-                              : isCorrectOption
-                              ? "Your answer — correct"
-                              : "Your answer"}
+                            {isCorrectOption ? "Correct answer" : "Your answer"}
                           </span>
                         )}
                       </div>

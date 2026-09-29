@@ -77,8 +77,8 @@ function TeacherDashboardHome() {
         </div>
       )}
 
-      <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3">
-        <div className="rounded-2xl bg-surface p-6 shadow-sm">
+      <div className="mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:grid md:grid-cols-3 md:overflow-visible md:pb-0">
+        <div className="w-[78%] shrink-0 snap-start rounded-2xl bg-surface p-6 shadow-sm md:w-auto">
           <div className="flex items-center justify-between">
             <p className="text-sm text-text-secondary">Total Exams</p>
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-lavender text-primary">
@@ -87,7 +87,7 @@ function TeacherDashboardHome() {
           </div>
           <p className="mt-3 text-3xl font-extrabold text-text-primary">{exams.length}</p>
         </div>
-        <div className="rounded-2xl bg-surface p-6 shadow-sm">
+        <div className="w-[78%] shrink-0 snap-start rounded-2xl bg-surface p-6 shadow-sm md:w-auto">
           <div className="flex items-center justify-between">
             <p className="text-sm text-text-secondary">Published</p>
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-success/10 text-success">
@@ -96,7 +96,7 @@ function TeacherDashboardHome() {
           </div>
           <p className="mt-3 text-3xl font-extrabold text-text-primary">{publishedCount}</p>
         </div>
-        <div className="rounded-2xl bg-surface p-6 shadow-sm">
+        <div className="w-[78%] shrink-0 snap-start rounded-2xl bg-surface p-6 shadow-sm md:w-auto">
           <div className="flex items-center justify-between">
             <p className="text-sm text-text-secondary">Drafts</p>
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-warning/10 text-warning">

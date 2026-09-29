@@ -84,14 +84,14 @@ function AdminDashboardHome() {
       <p className="mt-1 text-text-secondary">Here's what's happening across the platform.</p>
 
       {/* Stat cards */}
-      <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
+      <div className="mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:grid md:grid-cols-4 md:overflow-visible md:pb-0">
         {[
           { label: "Total Users", value: users.length, icon: Users, tone: "bg-lavender text-primary" },
           { label: "Students", value: studentCount, icon: GraduationCap, tone: "bg-lavender text-primary" },
           { label: "Teachers", value: teacherCount, icon: Users, tone: "bg-warning/10 text-warning" },
           { label: "Total Exams", value: exams.length, icon: FileText, tone: "bg-success/10 text-success" },
         ].map(({ label, value, icon: Icon, tone }) => (
-          <div key={label} className="rounded-2xl bg-surface p-5 shadow-sm">
+          <div key={label} className="w-[72%] shrink-0 snap-start rounded-2xl bg-surface p-5 shadow-sm md:w-auto">
             <div className="flex items-center justify-between">
               <p className="text-sm text-text-secondary">{label}</p>
               <span className={`flex h-8 w-8 items-center justify-center rounded-lg ${tone}`}>

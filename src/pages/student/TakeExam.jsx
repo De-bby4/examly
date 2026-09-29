@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Flag } from "lucide-react";
+import { Flag, LayoutGrid } from "lucide-react";
 
 import {
   getQuestionsForAttempt,
@@ -209,16 +209,29 @@ function TakeExam() {
     <div className="flex min-h-screen flex-col bg-app-bg text-text-primary">
       {/* ================= TOP HEADER ================= */}
       <header className="flex h-14 shrink-0 items-center border-b border-border bg-surface">
-  <div className="w-[220px] shrink-0" />
+  {/* Opens the question navigator - the sidebar is hidden on mobile */}
+  <button
+    type="button"
+    onClick={() => setNavigatorOpen(true)}
+    className="flex h-full shrink-0 items-center gap-1.5 border-r border-border bg-app-bg px-4 text-sm font-semibold text-text-primary md:hidden"
+  >
+    <LayoutGrid size={16} />
+    Questions
+  </button>
 
-  <div className="flex flex-1 items-center justify-center">
-    <h1 className="text-sm font-semibold text-text-primary">
+  <div className="hidden w-[220px] shrink-0 md:block" />
+
+  <div className="flex flex-1 items-center justify-center px-3">
+    <h1 className="hidden truncate text-sm font-semibold text-text-primary md:block">
       Online Examination - {examTitle}
     </h1>
   </div>
 
-  <div className="flex h-full w-[220px] shrink-0 items-center justify-center border-l border-border bg-app-bg text-sm font-semibold text-text-primary">
-    Time Left
+  <div className="flex h-full w-auto shrink-0 items-center justify-center gap-2 border-l border-border bg-app-bg px-4 text-sm font-semibold text-text-primary md:w-[220px]">
+    <span className="text-text-secondary">Time Left</span>
+    <span className="tabular-nums">
+      {time.h}:{time.m}:{time.s}
+    </span>
   </div>
 </header>
 
@@ -328,80 +341,49 @@ function TakeExam() {
       </div>
 
       {/* ================= BOTTOM BAR ================= */}
-<div className="fixed bottom-0 left-0 right-0 z-30 border-t border-border bg-surface px-12 pt-4 pb-3">
-  <div className="flex items-center justify-between gap-4 border-b border-border pb-3">
-    {/* Left buttons */}
-    <div className="flex items-center gap-2">
+<div className="fixed bottom-0 left-0 right-0 z-30 border-t border-border bg-surface px-4 pt-3 pb-3 md:px-12">
+  {/* Buttons — one line. The flag label collapses below sm so all four fit
+      without the submit wrapping onto its own row. */}
+  <div className="flex items-center gap-2 border-b border-border pb-3">
+    <button
+      onClick={toggleFlag}
+      aria-label="Mark for review"
+      className={`flex items-center gap-1.5 rounded-md px-3 py-2 text-xs font-semibold text-white md:px-4 ${
+        isFlagged
+          ? "bg-error/80"
+          : "bg-error hover:opacity-90"
+      }`}
+    >
+      <Flag size={13} />
+      <span className="hidden sm:inline">Mark for review</span>
+    </button>
+
+    <button
+      onClick={() =>
+        goTo(Math.max(0, currentIndex - 1))
+      }
+      disabled={currentIndex === 0}
+      className="rounded-md bg-primary px-4 py-2 text-xs font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50 md:px-5"
+    >
+      Previous
+    </button>
+
+    {currentIndex < questions.length - 1 && (
       <button
-        onClick={toggleFlag}
-        className={`flex items-center gap-1.5 rounded-md px-4 py-2 text-xs font-semibold text-white ${
-          isFlagged
-            ? "bg-error/80"
-            : "bg-error hover:opacity-90"
-        }`}
+        onClick={() => goTo(currentIndex + 1)}
+        className="rounded-md bg-primary px-4 py-2 text-xs font-semibold text-white hover:bg-primary-dark md:px-5"
       >
-        <Flag size={13} />
-        Mark for review
+        Next
       </button>
+    )}
 
-      <button
-        onClick={() =>
-          goTo(Math.max(0, currentIndex - 1))
-        }
-        disabled={currentIndex === 0}
-        className="rounded-md bg-primary px-5 py-2 text-xs font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        Previous
-      </button>
-
-      {currentIndex < questions.length - 1 && (
-        <button
-          onClick={() => goTo(currentIndex + 1)}
-          className="rounded-md bg-primary px-5 py-2 text-xs font-semibold text-white hover:bg-primary-dark"
-        >
-          Next
-        </button>
-      )}
-
-      {/* Submit */}
     <button
       onClick={() => handleSubmit(false)}
       disabled={submitting}
-      className="rounded-md bg-success px-6 py-2 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-60 ml-58"
+      className="ml-auto rounded-md bg-success px-4 py-2 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-60 md:px-6"
     >
       {submitting ? "Submitting..." : "Submit Exam"}
     </button>
-    </div>
-
-    
-  </div>
-
-  {/* Legend */}
-  <div className="flex items-center justify-center gap-16 pt-3 text-[11px] text-text-secondary">
-    <LegendDot
-      type="current"
-      label="Current"
-    />
-
-    <LegendDot
-      type="unanswered"
-      label="Not Attempted"
-    />
-
-    <LegendDot
-      type="answered"
-      label="Answered"
-    />
-
-    <LegendDot
-      type="flagged"
-      label="Not Answered"
-    />
-
-    <LegendDot
-      type="review"
-      label="Review"
-    />
   </div>
       </div>
 
@@ -520,6 +502,17 @@ function SidebarContent({
           goTo={goTo}
         />
       )}
+
+      {/* Legend — what the palette colours mean */}
+      <div className="border-b border-border px-5 py-4">
+        <div className="flex flex-col gap-2.5 text-[11px] text-text-secondary">
+          <LegendDot type="current" label="Current" />
+          <LegendDot type="unanswered" label="Not Attempted" />
+          <LegendDot type="answered" label="Answered" />
+          <LegendDot type="flagged" label="Not Answered" />
+          <LegendDot type="review" label="Review" />
+        </div>
+      </div>
     </div>
   );
 }
@@ -560,7 +553,7 @@ function QuestionGroup({
               key={question.id}
               onClick={() => goTo(actualIndex)}
               className={`
-                flex h-8 w-8 items-center justify-center
+                flex aspect-square w-full items-center justify-center
                 rounded-sm text-[11px] font-semibold
                 transition
                 ${getStatusClasses(status)}

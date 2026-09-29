@@ -81,8 +81,8 @@ const pieColors = ["var(--color-success)", "var(--color-error)"];
       <p className="mt-1 text-text-secondary">Here's what's happening with your exams.</p>
 
       {/* Stats */}
-      <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3">
-        <div className="flex flex-col items-center rounded-2xl bg-surface p-6 shadow-sm">
+      <div className="mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:grid md:grid-cols-3 md:overflow-visible md:pb-0">
+        <div className="flex w-[78%] shrink-0 snap-start flex-col items-center rounded-2xl bg-surface p-6 shadow-sm md:w-auto">
           <div className="flex w-full items-center justify-between">
             <p className="text-sm text-text-secondary">Exams Completed</p>
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-lavender text-primary">
@@ -94,7 +94,7 @@ const pieColors = ["var(--color-success)", "var(--color-error)"];
           </div>
         </div>
 
-        <div className="flex flex-col items-center rounded-2xl bg-surface p-6 shadow-sm">
+        <div className="flex w-[78%] shrink-0 snap-start flex-col items-center rounded-2xl bg-surface p-6 shadow-sm md:w-auto">
           <div className="flex w-full items-center justify-between">
             <p className="text-sm text-text-secondary">Average Score</p>
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-lavender text-primary">
@@ -106,7 +106,7 @@ const pieColors = ["var(--color-success)", "var(--color-error)"];
           </div>
         </div>
 
-        <div className="flex flex-col items-center rounded-2xl bg-surface p-6 shadow-sm">
+        <div className="flex w-[78%] shrink-0 snap-start flex-col items-center rounded-2xl bg-surface p-6 shadow-sm md:w-auto">
           <div className="flex w-full items-center justify-between">
             <p className="text-sm text-text-secondary">Best Score</p>
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-success/10 text-success">

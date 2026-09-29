@@ -164,8 +164,9 @@ function LandingPage() {
             ))}
           </div>
 
-          {/* Actions */}
-          <div className="flex items-center justify-end gap-2">
+          {/* Actions — pinned to the last column so hiding the links on mobile
+              doesn't slide them into the middle track */}
+          <div className="col-start-3 flex items-center justify-end gap-2">
             <button
               type="button"
               onClick={() => navigate("/login")}
@@ -194,10 +195,33 @@ function LandingPage() {
           </div>
         </div>
 
-        {/* Mobile menu */}
-        {menuOpen && (
-          <div className="border-t border-border bg-surface px-6 py-4 md:hidden">
-            <div className="flex flex-col gap-1">
+      </nav>
+
+      {/* Mobile menu — slides in as a side drawer */}
+      {menuOpen && (
+        <div
+          className="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm md:hidden"
+          onClick={() => setMenuOpen(false)}
+          role="presentation"
+        >
+          <div
+            className="ml-auto flex h-full w-72 max-w-[80%] animate-drawer-in flex-col border-l border-border bg-surface p-5"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="mb-6 flex items-center justify-between">
+              <Logo variant="arc" className="text-xl text-primary" />
+
+              <button
+                type="button"
+                onClick={() => setMenuOpen(false)}
+                aria-label="Close menu"
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-text-secondary transition hover:bg-app-bg hover:text-primary"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <nav className="flex flex-col gap-1">
               {NAV_LINKS.map((link) => (
                 <a
                   key={link.href}
@@ -208,13 +232,13 @@ function LandingPage() {
                   {link.label}
                 </a>
               ))}
-            </div>
+            </nav>
 
-            <div className="mt-4 flex items-center gap-2 border-t border-border pt-4">
+            <div className="mt-auto flex flex-col gap-2 border-t border-border pt-4">
               <button
                 type="button"
                 onClick={() => navigate("/login")}
-                className="flex-1 rounded-lg border border-border px-4 py-2.5 font-semibold text-indigo-deep transition hover:bg-app-bg"
+                className="rounded-lg border border-border px-4 py-2.5 font-semibold text-indigo-deep transition hover:bg-app-bg"
               >
                 Login
               </button>
@@ -222,14 +246,14 @@ function LandingPage() {
               <button
                 type="button"
                 onClick={() => navigate("/register")}
-                className="flex-1 rounded-lg bg-primary px-4 py-2.5 font-semibold text-white transition hover:bg-primary-dark"
+                className="rounded-lg bg-primary px-4 py-2.5 font-semibold text-white transition hover:bg-primary-dark"
               >
                 Get Started
               </button>
             </div>
           </div>
-        )}
-      </nav>
+        </div>
+      )}
 
       {/* Hero */}
 <main id="home" className="relative flex min-h-[78vh] scroll-mt-24 items-center overflow-hidden px-6 py-16">

@@ -124,8 +124,8 @@ function ExamResults() {
         {results.length === 0 ? (
           <p className="mt-4 text-sm text-text-secondary">No results match this filter.</p>
         ) : (
-          <div className="mt-4 overflow-hidden rounded-2xl bg-surface shadow-sm">
-            <table className="w-full text-left text-sm">
+          <div className="mt-4 overflow-x-auto rounded-2xl bg-surface shadow-sm">
+            <table className="w-full min-w-[640px] text-left text-sm">
               <thead className="border-b border-border bg-app-bg text-text-secondary">
                 <tr>
                   <th className="px-5 py-3 font-semibold">Student</th>

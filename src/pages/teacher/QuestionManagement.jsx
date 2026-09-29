@@ -156,16 +156,24 @@ function QuestionManagement() {
         Back to Manage Exams
       </button>
 
-      <div className="mt-3 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-extrabold text-text-primary">{exam?.title}</h1>
-          <p className="mt-1 text-text-secondary">{questions.length} question(s)</p>
+      <div className="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        {/* pl-5 lines the title up with the "Back to Manage Exams" label -
+            the back link's icon+gap occupies the same 20px on its left */}
+        <div className="pl-5">
+          <h1 className="text-2xl font-extrabold tracking-tight text-text-primary">
+            {exam?.title}
+          </h1>
+
+          <span className="mt-2 inline-block rounded-full bg-app-bg px-2.5 py-0.5 text-xs font-semibold text-text-secondary">
+            {questions.length} question(s)
+          </span>
         </div>
-        <div className="flex gap-2">
+
+        <div className="flex gap-2 sm:shrink-0">
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={importing}
-            className="flex items-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-semibold text-text-secondary hover:bg-surface disabled:opacity-60"
+            className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-semibold text-text-secondary transition hover:bg-app-bg disabled:opacity-60 sm:flex-none"
           >
             <Upload size={16} />
             {importing ? "Importing..." : "Import CSV"}
@@ -173,7 +181,7 @@ function QuestionManagement() {
           <input ref={fileInputRef} type="file" accept=".csv" onChange={handleCsvUpload} className="hidden" />
           <button
             onClick={openNewForm}
-            className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark"
+            className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-dark sm:flex-none"
           >
             <Plus size={16} />
             Add Question
@@ -186,11 +194,14 @@ function QuestionManagement() {
       )}
 
       {questions.length === 0 ? (
-        <div className="mt-6 flex flex-col items-center justify-center rounded-2xl bg-surface py-12 text-center shadow-sm">
+        <div className="mt-6 flex flex-col items-center justify-center rounded-2xl border border-border bg-surface px-6 py-12 text-center shadow-sm">
           <span className="flex h-12 w-12 items-center justify-center rounded-full bg-lavender text-primary">
             <HelpCircle size={20} />
           </span>
-          <p className="mt-3 text-sm text-text-secondary">No questions yet. Add your first one.</p>
+
+          <p className="mt-3 text-sm text-text-secondary">
+            No questions yet. Use “Add Question” to create your first one.
+          </p>
         </div>
       ) : (
         <div className="mt-6 space-y-3">
@@ -235,7 +246,7 @@ function QuestionManagement() {
       {questions.length > 0 && (
         <button
           onClick={() => navigate("/teacher/exams")}
-          className="mt-8 w-full rounded-lg bg-primary py-3 font-semibold text-white hover:bg-primary-dark"
+          className="mt-8 w-full rounded-lg bg-primary py-3 font-semibold text-white transition hover:bg-primary-dark"
         >
           Done — Back to Manage Exams
         </button>
