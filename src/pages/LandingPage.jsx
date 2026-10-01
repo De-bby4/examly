@@ -119,7 +119,7 @@ function HubItem({ icon: Icon, title, body, side }) {
         <Icon size={18} strokeWidth={2} aria-hidden="true" />
       </span>
 
-      <h3 className="mt-3 whitespace-nowrap text-base font-bold tracking-tight text-indigo-deep">
+      <h3 className="mt-3 text-base font-bold tracking-tight text-indigo-deep lg:whitespace-nowrap">
         {title}
       </h3>
 
@@ -314,7 +314,19 @@ function LandingPage() {
     </Reveal>
 
     <div className="relative mt-16 lg:h-[36rem]">
-      <Reveal className="relative mx-auto flex w-full max-w-md flex-col items-center lg:absolute lg:left-1/2 lg:top-[57%] lg:h-[30rem] lg:w-auto lg:max-w-none lg:-translate-x-1/2 lg:-translate-y-1/2">
+      <div className="grid grid-cols-2 gap-x-6 gap-y-8 sm:gap-x-8 lg:mt-0 lg:block">
+        {FEATURES.map((feature, index) => (
+          <div
+            key={feature.title}
+            className={`animate-hub-float lg:absolute lg:w-44 ${HUB_POS[index]}`}
+            style={{ animationDelay: `${index * 0.4}s` }}
+          >
+            <HubItem {...feature} side={index < 3 ? "left" : "right"} />
+          </div>
+        ))}
+      </div>
+
+      <Reveal className="relative mx-auto mt-12 flex w-full max-w-[16rem] flex-col items-center sm:max-w-xs lg:absolute lg:left-1/2 lg:top-[57%] lg:mt-0 lg:h-[30rem] lg:w-auto lg:max-w-none lg:-translate-x-1/2 lg:-translate-y-1/2">
         <div
           aria-hidden="true"
           className="absolute bottom-2 left-1/2 h-40 w-72 -translate-x-1/2 rounded-full bg-primary/10 blur-3xl"
@@ -326,18 +338,6 @@ function LandingPage() {
           className="relative w-full lg:h-full lg:w-auto lg:max-w-none"
         />
       </Reveal>
-
-      <div className="mt-10 grid gap-10 lg:mt-0 lg:block">
-        {FEATURES.map((feature, index) => (
-          <div
-            key={feature.title}
-            className={`animate-hub-float lg:absolute lg:w-44 ${HUB_POS[index]}`}
-            style={{ animationDelay: `${index * 0.4}s` }}
-          >
-            <HubItem {...feature} side={index < 3 ? "left" : "right"} />
-          </div>
-        ))}
-      </div>
     </div>
   </div>
 </section>

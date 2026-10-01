@@ -1,0 +1,7 @@
+Rework Why Examly section layout on mobile
+
+Show the feature cards in a two-column grid with the avatar beneath them
+on small screens, instead of the cramped vertical stack. Desktop keeps
+the lg ring layout around the photo.
+
+Co-authored-by: CommandCodeBot <noreply@commandcode.ai>
