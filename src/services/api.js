@@ -1,9 +1,10 @@
 import axios from "axios";
 
 const api = axios.create({
-  // Relative on purpose: the dev server proxies /api to the backend, so requests
-  // are same-origin and never hit a CORS preflight.
-  baseURL: "/api",
+  // In dev the server proxies /api to the backend, so a relative base keeps every
+  // request same-origin and CORS-free. In production there is no such proxy, so
+  // VITE_API_URL points at the deployed backend's URL instead.
+  baseURL: import.meta.env.VITE_API_URL || "/api",
 });
 
 // Login and register are unauthenticated calls. Sending a stale/expired token on
