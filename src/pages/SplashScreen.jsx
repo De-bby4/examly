@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ExamlyPencil } from "../components/ExamlyLogo";
-// One hit per bounce contact: two hops, the landing on the E, then the smaller
-// in-place bounce that follows it.
+// One hit per bounce contact: the ground hops, the landing on the E, then the
+// smaller in-place bounce that follows it.
 import hopOne from "../assets/bounce.wav"; // 1st hop
 import hopTwo from "../assets/bounce1.wav"; // 2nd hop
 import landOnE from "../assets/bounce2.wav"; // lands on the E
@@ -28,6 +28,13 @@ const LOGO_VARS = {
   "--e-ground": "calc(-1 * (var(--font) * 0.33 + 34.5px))", // X's ink on the E's top
   "--hop": "calc(var(--font) * -0.85)", // height of a ground hop
 };
+
+// The X's entrance differs by screen: phones get a single ground hop, larger
+// screens keep the original two. Read once - a splash never resizes mid-play.
+const IS_MOBILE =
+  typeof window !== "undefined" &&
+  window.matchMedia &&
+  window.matchMedia("(max-width: 767px)").matches;
 
 const SLOT = 80; // px, the square the crossed pencils live in
 
@@ -65,8 +72,9 @@ const E_AT = 80;
 const HOP_AT = 420;
 // Landing on the E's top edge, 78% of the way through the hop.
 const THUMP_AT = HOP_AT + Math.round(HOP_MS * 0.78);
-// The smaller in-place bounce on the E that follows it, at 92%.
-const BOUNCE_AT = HOP_AT + Math.round(HOP_MS * 0.92);
+// The smaller in-place bounce on the E that follows it: 93% on phones, where the
+// single hop shifts the beats, 92% on larger screens.
+const BOUNCE_AT = HOP_AT + Math.round(HOP_MS * (IS_MOBILE ? 0.93 : 0.92));
 const LANDED_AT = HOP_AT + HOP_MS;
 // Let the last bounce sound ring out and the X come fully to rest before the
 // pencil starts, so the writing never steps on the tail.
@@ -80,16 +88,27 @@ const prefersReducedMotion = () =>
   window.matchMedia &&
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-// The hop's four ground contacts, and how long each sound may ring before the
-// next one: gaps of 270 / 459 / 189 ms, then 318 ms of clear air before the
-// pencil starts tracing. Exporters often leave silence in front of a hit, which
-// would land it late, so each clip is trimmed to its first real sample at load.
-const HITS = [
-  { src: hopOne, ms: 270 }, // 1st hop        -> 270ms to the next beat
-  { src: hopTwo, ms: 450 }, // 2nd hop        -> 459ms
-  { src: landOnE, ms: 180 }, // lands on the E -> 189ms, so keep it tight
-  { src: bounceInPlace, ms: 640 }, // bounces in place - rings out before writing
-];
+// The bounce's ground contacts, and how long each sound may ring before the
+// next one. Phones make a single ground hop, so three sounds; larger screens hop
+// twice, so four. Exporters often leave silence in front of a hit, which would
+// land it late, so each clip is trimmed to its first real sample at load.
+const HITS = IS_MOBILE
+  ? [
+      { src: hopOne, ms: 640 }, // ground hop     -> room before landing on the E
+      { src: landOnE, ms: 200 }, // lands on the E -> tight before the in-place bounce
+      { src: bounceInPlace, ms: 640 }, // bounces in place - rings out before writing
+    ]
+  : [
+      { src: hopOne, ms: 270 }, // 1st hop        -> 270ms to the next beat
+      { src: hopTwo, ms: 450 }, // 2nd hop        -> 459ms
+      { src: landOnE, ms: 180 }, // lands on the E -> 189ms, so keep it tight
+      { src: bounceInPlace, ms: 640 }, // bounces in place - rings out before writing
+    ];
+
+// When each hit above fires.
+const HIT_AT = IS_MOBILE
+  ? [HOP_AT + Math.round(HOP_MS * 0.3), THUMP_AT, BOUNCE_AT]
+  : [HOP_AT + 324, HOP_AT + 594, THUMP_AT, BOUNCE_AT];
 
 const hitStart = (buffer) => {
   const data = buffer.getChannelData(0);
@@ -389,11 +408,8 @@ const SplashScreen = () => {
       // X starts hopping in from the left
       setTimeout(() => setStage("x-hop"), HOP_AT),
 
-      // A hit on each of the hop's four ground contacts.
-      setTimeout(() => playHit(0), HOP_AT + 324), // 1st hop
-      setTimeout(() => playHit(1), HOP_AT + 594), // 2nd hop
-      setTimeout(() => playHit(2), THUMP_AT), // lands on the E
-      setTimeout(() => playHit(3), BOUNCE_AT), // bounces in place on the E
+      // A hit on each of the bounce's contacts.
+      ...HIT_AT.map((at, i) => setTimeout(() => playHit(i), at)),
 
       // X lands on the top of the E, and the E takes the impact
       setTimeout(() => setThumped(true), THUMP_AT),
@@ -443,6 +459,7 @@ const SplashScreen = () => {
             font-family: 'Baloo 2', sans-serif;
           }
 
+          /* larger screens: two ground hops, then the leap onto the E */
           @keyframes pencilHop {
             0% {
               transform: translate(-46vw, 0) rotate(-25deg);
@@ -510,6 +527,63 @@ const SplashScreen = () => {
             }
           }
 
+          /* phones: a single ground hop, then the leap onto the E */
+          @keyframes pencilHopMobile {
+            0% {
+              transform: translate(-46vw, 0) rotate(-25deg);
+              opacity: 0;
+            }
+
+            6% {
+              opacity: 1;
+            }
+
+            /* the one ground hop */
+            18% {
+              transform: translate(-33vw, var(--hop)) rotate(-15deg);
+              animation-timing-function: ease-in;
+            }
+
+            30% {
+              transform: translate(-22vw, 0) rotate(12deg);
+              animation-timing-function: ease-out;
+            }
+
+            /* the leap up onto the E */
+            58% {
+              transform: translate(-13vw, calc(var(--e-ground) - 135px)) rotate(6deg) scale(1);
+              animation-timing-function: ease-in;
+            }
+
+            70% {
+              transform: translate(var(--e-offset), calc(var(--e-ground) - 136px)) rotate(2deg);
+              animation-timing-function: ease-in;
+            }
+
+            /* SQUASH on the top of the E */
+            78% {
+              transform: translate(var(--e-offset), var(--e-ground)) rotate(-4deg) scale(1.16, 0.82);
+              animation-timing-function: ease-out;
+            }
+
+            /* STRETCH as it springs back up */
+            86% {
+              transform: translate(var(--e-offset), calc(var(--e-ground) - 80px)) rotate(4deg) scale(0.94, 1.07);
+              animation-timing-function: ease-in;
+            }
+
+            /* the smaller bounce on the E */
+            93% {
+              transform: translate(var(--e-offset), var(--e-ground)) rotate(-2deg) scale(1.07, 0.93);
+              animation-timing-function: ease-out;
+            }
+
+            100% {
+              transform: translate(0, 0) rotate(0deg) scale(1);
+              opacity: 1;
+            }
+          }
+
           /* the E takes the hit: pressed down, then wobbles back */
           @keyframes eReact {
             0% {
@@ -534,7 +608,8 @@ const SplashScreen = () => {
           }
 
           /* ground shadow the X hops along: it stays put while the X rises,
-             shrinking and fading with height, and spreads on each landing */
+             shrinking and fading with height, and spreads on each landing.
+             Larger screens: two ground contacts. */
           @keyframes xShadow {
             0% {
               transform: translate(-46vw, 0) scale(0.5, 0.7);
@@ -592,6 +667,62 @@ const SplashScreen = () => {
             }
 
             92% {
+              transform: translate(var(--e-offset), 0) scale(0.5, 0.68);
+              opacity: 0.12;
+            }
+
+            100% {
+              transform: translate(0, 0) scale(1, 1);
+              opacity: 0.45;
+            }
+          }
+
+          /* phones: a single ground contact. */
+          @keyframes xShadowMobile {
+            0% {
+              transform: translate(-46vw, 0) scale(0.5, 0.7);
+              opacity: 0;
+            }
+
+            6% {
+              transform: translate(-40vw, 0) scale(0.6, 0.75);
+              opacity: 0.14;
+            }
+
+            18% {
+              transform: translate(-33vw, 0) scale(0.62, 0.75);
+              opacity: 0.16;
+              animation-timing-function: ease-in;
+            }
+
+            30% {
+              transform: translate(-22vw, 0) scale(1.24, 0.72);
+              opacity: 0.46;
+              animation-timing-function: ease-out;
+            }
+
+            58% {
+              transform: translate(-13vw, 0) scale(0.35, 0.6);
+              opacity: 0.06;
+              animation-timing-function: ease-out;
+            }
+
+            70% {
+              transform: translate(var(--e-offset), 0) scale(0.35, 0.6);
+              opacity: 0.06;
+            }
+
+            78% {
+              transform: translate(var(--e-offset), 0) scale(0.5, 0.68);
+              opacity: 0.12;
+            }
+
+            86% {
+              transform: translate(var(--e-offset), 0) scale(0.36, 0.6);
+              opacity: 0.07;
+            }
+
+            93% {
               transform: translate(var(--e-offset), 0) scale(0.5, 0.68);
               opacity: 0.12;
             }
@@ -698,7 +829,7 @@ const SplashScreen = () => {
                 animation: reducedMotion
                   ? "none"
                   : stage === "x-hop"
-                  ? `xShadow ${HOP_MS}ms cubic-bezier(0.25, 0.8, 0.25, 1) forwards`
+                  ? `${IS_MOBILE ? "xShadowMobile" : "xShadow"} ${HOP_MS}ms cubic-bezier(0.25, 0.8, 0.25, 1) forwards`
                   : "none",
               }}
             />
@@ -710,7 +841,7 @@ const SplashScreen = () => {
                 animation: reducedMotion
                   ? "none"
                   : stage === "x-hop"
-                  ? `pencilHop ${HOP_MS}ms cubic-bezier(0.25, 0.8, 0.25, 1) forwards`
+                  ? `${IS_MOBILE ? "pencilHopMobile" : "pencilHop"} ${HOP_MS}ms cubic-bezier(0.25, 0.8, 0.25, 1) forwards`
                   : attached
                   ? "landWobble 650ms cubic-bezier(0.4, 0, 0.6, 1) forwards"
                   : "none",
