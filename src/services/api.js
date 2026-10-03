@@ -1,10 +1,16 @@
 import axios from "axios";
 
+// The deployed backend (Render). Used as a production fallback so the app still
+// reaches the API even if the host's build settings don't provide VITE_API_URL.
+const PROD_API_URL = "https://examly-backend-at2w.onrender.com/api";
+
 const api = axios.create({
   // In dev the server proxies /api to the backend, so a relative base keeps every
-  // request same-origin and CORS-free. In production there is no such proxy, so
-  // VITE_API_URL points at the deployed backend's URL instead.
-  baseURL: import.meta.env.VITE_API_URL || "/api",
+  // request same-origin and CORS-free. In production we talk straight to the
+  // deployed backend (VITE_API_URL wins if it is set).
+  baseURL:
+    import.meta.env.VITE_API_URL ||
+    (import.meta.env.DEV ? "/api" : PROD_API_URL),
 });
 
 // Login and register are unauthenticated calls. Sending a stale/expired token on
